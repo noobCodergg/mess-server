@@ -2,26 +2,27 @@ const userModel = require('../models/userModel')
 const otpModel = require('../models/otpModel')
 const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken")
-require("dotenv").config();
+
+// Registration controller without OTP
 exports.registration = async (req, res) => {
   try {
-    const { name, email,password, address, phone, company, website ,role } = req.body;
+    const { name, email, password, address, phone, company, website, role } = req.body;
 
-
+    // Check if user already exists
     const existingUser = await userModel.findOne({ email });
     if (existingUser) {
       return res.status(401).json("User already exists!");
     }
 
+    // Validate password length
     if (password.length < 8) {
       return res
         .status(402)
         .json("Password must be at least 8 characters long!");
     }
 
-    const otp = Math.floor(1000 + Math.random() * 9000).toString();
-
-    await otpModel.create({
+    // Directly create user
+    const newUser = await userModel.create({
       name,
       email,
       password,
@@ -29,62 +30,16 @@ exports.registration = async (req, res) => {
       phone,
       company,
       website,
-      role,
-      otp,
-      
+      role: role || "user", // default role as user
     });
 
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: "muntasirniloy2002@gmail.com",
-        pass: process.env.app_password,
-      },
-    });
-
-    const mailOptions = {
-      from: '"Page2Page" muntasirniloy2002@gmail.com',
-      to: email,
-      subject: "Your OTP Code",
-      html: `<p>Your OTP code is: <b>${otp}</b></p><p>This OTP is valid for 1 minutes.</p>`,
-    };
-
-    const info = await transporter.sendMail(mailOptions);
-    res
-      .status(200)
-      .json("OTP sent to your email. Please verify to complete registration.");
+    res.status(200).json("Account created successfully!");
   } catch (err) {
     console.error("Registration error:", err.message);
     res.status(500).json("Something went wrong");
   }
 };
 
-
-exports.verifyOTP = async (req, res) => {
-  try {
-    const { otp, email } = req.body;
-    
-    console.log(otp,email)
-    const record = await otpModel.findOne({ email });
-    if (!record) {
-      return res.status(400).json("Your OTP has expired!");
-    }
-
-    if (record.otp !== otp) {
-      return res.status(400).json("Invalid OTP!");
-    }
-
-    const { name, password, address, phone, company, website ,role  } = record;
-    await userModel.create({ name, email,password, address, phone, company, website ,role:"user"  });
-
-    await otpModel.deleteOne({ email });
-
-    res.status(200).json("Account created successfully!");
-  } catch (error) {
-    console.error("OTP verification error:", error.message);
-    res.status(500).json("Internal Server Error");
-  }
-};
 
 
 exports.login = async (req, res) => {
