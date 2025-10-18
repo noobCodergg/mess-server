@@ -17,7 +17,7 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin: "https://moonlit-gingersnap-992023.netlify.app", 
+    origin: "https://visionary-cendol-f63d55.netlify.app", 
     methods: ["GET,POST,PUT,DELETE"],
     credentials: true, 
   })
