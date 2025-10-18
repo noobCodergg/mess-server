@@ -18,7 +18,7 @@ app.use(express.json());
 app.use(
   cors({
     origin: "https://inspiring-creponne-9cb190.netlify.app", 
-    methods: "GET,POST,PUT,DELETE",
+    methods: ["GET,POST,PUT,DELETE"],
     credentials: true, 
   })
 );
