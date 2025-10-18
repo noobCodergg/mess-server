@@ -38,7 +38,7 @@ exports.registration = async (req, res) => {
       service: "gmail",
       auth: {
         user: "muntasirniloy2002@gmail.com",
-        pass: "neih ewru erye hfvg",
+        pass: process.env.app_password,
       },
     });
 
