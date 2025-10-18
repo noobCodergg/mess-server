@@ -2,7 +2,7 @@ const userModel = require('../models/userModel')
 const otpModel = require('../models/otpModel')
 const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken")
-
+require("dotenv").config();
 exports.registration = async (req, res) => {
   try {
     const { name, email,password, address, phone, company, website ,role } = req.body;
